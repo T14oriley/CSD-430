@@ -1,20 +1,17 @@
-<%-- 
-  Module 6 Assignment
-  Tyler O'Riley
-  11/19/2023
-  CSD430
-  DB connection and creation file for bookstore web page
---%>
+<%--
+CSD430 Tyler O'Riley 11/21/2023 Assignments 5
+Ebookshop project
+ --%>
+
 <%@page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@page trimDirectiveWhitespaces="true"%>
-<%@page session="true" import="mod5.book, java.util.*"%>
+<%@page session="true" import="ebookshop.Book, java.util.Vector"%>
 
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
 	<title>E-BookShop Checkout</title>
 	<style type="text/css">
     body {
@@ -29,7 +26,7 @@
     	border-collapse: separate;
     }
     td {
-    	padding: 5px; 
+    	padding: 5px;
     }
    	</style>
 </head>
@@ -44,8 +41,8 @@
   		</tr>
 		<%
 			@SuppressWarnings("unchecked")
-		    Vector<book> shoplist = (Vector<book>) session.getAttribute("mod5.cart");
-		    for (book anOrder : shoplist) {
+		    Vector<Book> shoplist = (Vector<Book>) session.getAttribute("ebookshop.cart");
+		    for (Book anOrder : shoplist) {
 		%>
       	<tr>
 	        <td><%=anOrder.getTitle()%></td>
@@ -63,6 +60,6 @@
 	    </tr>
     </table>
   	<p/>
-  	<a href="/mod5/eshop">Buy more!</a>
+  	<a href="/ebookshop/eshop">Buy more!</a>
 </body>
 </html>

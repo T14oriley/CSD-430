@@ -1,51 +1,45 @@
-package mod5;
+package ebookshop;
 
-/*
- * Module 6 Assignment
- * Tyler O'Riley
- * 11/19/2023
- * CSD430
- * DB connection and creation file for bookstore web page
- */
-
+import java.util.Vector;
 import java.io.IOException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import java.util.Vector;
 import javax.servlet.ServletContext;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet implementation class ShoppingServlet
+ */
 @WebServlet("/eshop")
-public class shopServlet extends HttpServlet {
+public class ShoppingServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    public shopServlet() {
+	
+	public ShoppingServlet() {
         super();
-    }
-
-    public void init(ServletConfig config) throws ServletException {
+	}
+        
+	public void init(ServletConfig config) throws ServletException {
     	System.out.println("**** INITIALIZING CONTROLLER SREVLET ****");
     	super.init(config);
-    	
-    }
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+	
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// forward call to doPost()
 		doPost(request,response);
 	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+ 
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession(true);
 		
 	    @SuppressWarnings("unchecked")
-	    Vector<book> shoplist = (Vector<book>)session.getAttribute("mod5.cart");
+	    
+	    Vector<Book> shoplist = (Vector<Book>)session.getAttribute("ebookshop.cart");
 	    
 	    String do_this = request.getParameter("do_this");
 
@@ -58,7 +52,7 @@ public class shopServlet extends HttpServlet {
 	    	blist.addElement("Pro Spatial with SQL Server 2012. Alastair Aitchison $59.99");
 	    	blist.addElement("Beginning Database Design. Clare Churner $34.99");
 	    	
-	    	session.setAttribute("mod5.list", blist);
+	    	session.setAttribute("ebookshop.list", blist);
 	    	
 	    	ServletContext    sc = request.getSession().getServletContext();
 	    	RequestDispatcher rd = sc.getRequestDispatcher("/");
@@ -70,7 +64,7 @@ public class shopServlet extends HttpServlet {
 		        float dollars = 0;
 		        int   books = 0;
 		        
-		        for (book aBook : shoplist) {
+		        for (Book aBook : shoplist) {
 		        	float price = aBook.getPrice();
 		        	int   qty = aBook.getQuantity();
 		        	dollars += price * qty;
@@ -81,53 +75,55 @@ public class shopServlet extends HttpServlet {
 		        request.setAttribute("books", String.valueOf(books));
 		        
 		        ServletContext    sc = request.getServletContext();
-		        RequestDispatcher rd = sc.getRequestDispatcher("/checkOut.jsp");
+		        RequestDispatcher rd = sc.getRequestDispatcher("/Checkout.jsp");
 		        rd.forward(request, response);
 		        
-	    	} 
+	    	} // if (..checkout..
 	    	else { 
+	    		// Not a checkout request - Manipulate the list of books
 	    		if (do_this.equals("remove")) {
 					String pos = request.getParameter("position");
 					shoplist.removeElementAt(Integer.parseInt(pos));
 	    		}
 	    		else if (do_this.equals("add")) {
 		    		boolean  found = false;
-		    		book aBook = getBook(request);
+		    		Book aBook = getBook(request);
 		    		
-			        if (shoplist == null) {  
-			        	shoplist = new Vector<book>();
+			        if (shoplist == null) {  // the shopping cart is empty
+			        	shoplist = new Vector<Book>();
 			        	shoplist.addElement(aBook);
-			        } else {  
+			        } else {  // update the #copies if the book is already there
 			        	for (int i = 0; i < shoplist.size() && !found; i++) {
-			        		book b = (book)shoplist.elementAt(i);
+			        		Book b = (Book)shoplist.elementAt(i);
 			        		if (b.getTitle().equals(aBook.getTitle())) {
 			        			b.setQuantity(b.getQuantity() + aBook.getQuantity());
 			        			shoplist.setElementAt(b, i);
 			        			found = true;
 			        		}
-			        	} 
+			        	} // for (i..
 			        	
-			        	if (!found) {  
+			        	if (!found) {  // if it is a new book => Add it to the shoplist
 			        		shoplist.addElement(aBook);
 			        	}
-			        } 
-	    		} 
+			        } // if (shoplist == null) .. else ..
+	    		} // if (..add..
 
-				session.setAttribute("mod5.cart", shoplist);
+				// Save the updated list of books and return to the home page
+				session.setAttribute("ebookshop.cart", shoplist);
 				ServletContext sc = request.getSession().getServletContext();
 				RequestDispatcher rd = sc.getRequestDispatcher("/");
 				rd.forward(request, response);
-	    	} 
-	    } 
-	} 
+	    	} // if (..checkout..else
+	    } // if (do_this..
+	} // doPost
 	
-
-	private book getBook(HttpServletRequest req) {
+    	
+	private Book getBook(HttpServletRequest req) {
 	  	String myBook = req.getParameter("book");
 	    int    n = myBook.indexOf('$');
 	    String title = myBook.substring(0, n);
 	    String price = myBook.substring(n+1);
 	    String qty = req.getParameter("qty");
-	    return new book(title, Float.parseFloat(price), Integer.parseInt(qty));
-	} 
+	    return new Book(title, Float.parseFloat(price), Integer.parseInt(qty));
+	} // getBook
 }
