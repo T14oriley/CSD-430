@@ -1,16 +1,20 @@
+//CSD430 Tyler O'Riley 11/21/2023 Assignments 5
+//Ebookshop project
+
 package ebookshop;
 
-import java.util.Vector;
 import java.io.IOException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletContext;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import java.util.Vector;
+import javax.servlet.ServletContext;
+import javax.servlet.RequestDispatcher;
 
 /**
  * Servlet implementation class ShoppingServlet
@@ -18,27 +22,41 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/eshop")
 public class ShoppingServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
-	public ShoppingServlet() {
+       
+	/**
+     * Constructor for the ShoppingServlet class.
+     */
+    public ShoppingServlet() {
         super();
-	}
-        
-	public void init(ServletConfig config) throws ServletException {
+        // TODO Auto-generated constructor stub
+    }
+    /**
+     * Initializes the servlet.
+     */
+    public void init(ServletConfig config) throws ServletException {
     	System.out.println("**** INITIALIZING CONTROLLER SREVLET ****");
     	super.init(config);
-	}
-	
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	
+    }
+
+    /**
+	 * Handles HTTP GET requests.
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// forward call to doPost()
 		doPost(request,response);
 	}
- 
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	/**
+	 * Handles HTTP POST requests.
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		// Get the current session
 		HttpSession session = request.getSession(true);
 		
+
 	    @SuppressWarnings("unchecked")
-	    
 	    Vector<Book> shoplist = (Vector<Book>)session.getAttribute("ebookshop.cart");
 	    
 	    String do_this = request.getParameter("do_this");
@@ -80,7 +98,6 @@ public class ShoppingServlet extends HttpServlet {
 		        
 	    	} // if (..checkout..
 	    	else { 
-	    		// Not a checkout request - Manipulate the list of books
 	    		if (do_this.equals("remove")) {
 					String pos = request.getParameter("position");
 					shoplist.removeElementAt(Integer.parseInt(pos));
@@ -117,7 +134,12 @@ public class ShoppingServlet extends HttpServlet {
 	    } // if (do_this..
 	} // doPost
 	
-    	
+	/**
+	 * Retrieves the book information from the request parameters.
+	 *
+	 * @param req The HTTP servlet request.
+	 * @return A Book object containing the book title, price, and quantity.
+	 */
 	private Book getBook(HttpServletRequest req) {
 	  	String myBook = req.getParameter("book");
 	    int    n = myBook.indexOf('$');
